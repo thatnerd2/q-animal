@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+	<script type="text/javascript" src="js/convnet-min.js"></script>
+	<script type="text/javascript" src="js/deepqlearn.js"></script>
+	<script type="text/javascript" src="js/cnn-util.js"></script>
+	<script type="text/javascript" src="js/blob.js"></script>
+	<script type="text/javascript" src="js/item-gen.js"></script>
+</head>
+
+<body>
+
+	<script>
+
+		var blob;
+		var items;
+		var walls;
+		var sim = new Phaser.Game(800, 600, Phaser.AUTO, 'simulation', { preload: preload, create: create, update: update});
+
+
+		function uuid () {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+		    return v.toString(16);
+		});
+		}
+
+		function preload () {
+			sim.stage.backgroundColor = 0xffffff;
+			sim.load.image('blob', 'assets/blob.png');
+			sim.load.image('gooditem', 'assets/good-item.png');
+			sim.load.image('baditem', 'assets/bad-item.png');
+			sim.load.image('wall', 'assets/wall.png');
+			sim.physics.startSystem(Phaser.Physics.ARCADE);
+		}
+
+		function create () {
+			items = {};
+			for (var i = 0; i < 20; i++) {
+				var testItem = new Item(uuid(), sim, Math.random() * 600 + 100, Math.random() * 400 + 100, Math.random() > 0.5 ? true : false);
+				items[testItem.id] = testItem;
+			}
+
+			walls = sim.add.physicsGroup(Phaser.Physics.ARCADE);
+			var borderTop = sim.add.sprite(0, 0, 'wall');
+			var borderBottom = sim.add.sprite(0, 590, 'wall');
+			var borderLeft = sim.add.sprite(0, 0, 'wall');
+			var borderRight = sim.add.sprite(790, 0, 'wall');
+			borderLeft.height = 600;
+			borderRight.height = 600;
+			borderTop.width = 800;
+			borderBottom.width = 800;
+			walls.add(borderTop);
+			walls.add(borderBottom);
+			walls.add(borderLeft);
+			walls.add(borderRight);
+			walls.setAll('body.immovable', 'true');
+
+			blob = new Blob(uuid(), sim, 300, 300);
+			blob.live();
+			randomItem();
+		}
+
+		function update () {
+			sim.physics.arcade.collide(blob.heart, walls);
+			for (var k in items) {
+				var f = items[k];
+				if (checkOverlap(f.heart, blob.heart)) {
+					blob.consume(f);
+					f.die();
+				}
+			}
+		}
+
+		function randomItem () {
+			var newItem = new Item(uuid(), sim, Math.random()*600 + 100, Math.random()*400 + 100, (Math.random() > 0.5) ? 1 : 0);
+			items[newItem.id] = newItem;
+			setTimeout(randomItem, 300 + 10*Object.keys(items).length);
+		}
+
+		function checkOverlap(spriteA, spriteB) {
+		    var boundsA = spriteA.getBounds();
+		    var boundsB = spriteB.getBounds();
+		    return Phaser.Rectangle.intersects(boundsA, boundsB);
+		}
+
+	</script>
+<div id="stats">
+	<p id="numgreen">Number of Green Eaten: 0</p>
+	<p id="numred">Number of Red Eaten: 0</p>
+</div>
+</body>

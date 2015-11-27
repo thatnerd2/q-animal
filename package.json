@@ -1,0 +1,27 @@
+{
+  "name": "q-animal",
+  "version": "1.0.0",
+  "description": "Fun with deep-q-learning",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://thatnerd2@github.com/thatnerd2/q-animal.git"
+  },
+  "keywords": [
+    "reinforcement-learning",
+    "phaser"
+  ],
+  "author": "Aaron Y. Chan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thatnerd2/q-animal/issues"
+  },
+  "homepage": "https://github.com/thatnerd2/q-animal#readme",
+  "dependencies": {
+    "express": "^4.13.3",
+    "node-uuid": "^1.4.7"
+  }
+}
